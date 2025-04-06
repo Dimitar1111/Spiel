@@ -1,9 +1,13 @@
 package GUI.Rennspiel1;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
+import java.io.File;
+import java.io.IOException;
 
 public class Rennspiel {
 
@@ -15,6 +19,11 @@ public class Rennspiel {
     static int x_diff_Auto;
     static int y_diff_Auto;
     static boolean schneller = false;
+    static Timer timer;
+    static int baseSpeed = 10;
+    static int currentSpeed = baseSpeed;
+
+    static int maxSpeed = 22;
 
     public static void main(String[] args) {
 
@@ -44,35 +53,39 @@ public class Rennspiel {
         start = new JButton("Start");
         start.setFocusable(false);
         start.setBounds(100,20,100,50);
+        start.setOpaque(true);
         frm.add(start);
-        start.addActionListener(e ->
-                {
-                    Spielstatus = "RUN";
-                });
+        start.addActionListener(e -> Spielstatus = "RUN");
 
         //Pause Button
         pause = new JButton("Pause");
+        pause.setOpaque(true);
         pause.setFocusable(false);
         pause.setBounds(220,20,100,50);
         frm.add(pause);
-        pause.addActionListener(e ->
-        {
-            Spielstatus = "POS";
-        });
+        pause.addActionListener(e -> Spielstatus = "POS");
         System.out.println(Spielstatus);
+        BufferedImage autoimage;
+        try {
+            autoimage = ImageIO.read(new File("C:\\Users\\Viktor K\\IdeaProjects\\1Project\\src\\GUI\\resources\\img.png"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        Auto = new JLabel(new ImageIcon((Image) autoimage));
+        Auto.setBounds(323, 305, autoimage.getWidth(), autoimage.getHeight()); // Initial position
+        //uto.setIcon(new ImageIcon("C:\\Users\\jonas\\Desktop\\Development\\java\\general\\JTest\\src\\main\\resources\\car_1.png")); // Add your car image here
+        Auto.setOpaque(false);
+        frm.add(Auto); // Add car to the frame
 
         // willkommensfenster
-        JOptionPane.showMessageDialog(null, "Hallo, und willkommen zum Street Racer", "", JOptionPane.INFORMATION_MESSAGE);
+        //JOptionPane.showMessageDialog(null, "Hallo, und willkommen zum Street Racer", "", JOptionPane.INFORMATION_MESSAGE);
 
+        // Background Panel erstellen
         BackgroundPanel backgroundPanel = new BackgroundPanel();
+        backgroundPanel.setOpaque(true);
         backgroundPanel.setBounds(0, 0, frm.getWidth(), frm.getHeight());
-        frm.add(backgroundPanel); //background panel erzeugen
-
-        // Auto erzeugen
-        Auto = new JLabel();
-        Auto.setBounds(323, 110, 323, 110); // Initial position
-        Auto.setIcon(new ImageIcon("C:\\Users\\Viktor K\\IdeaProjects\\1Project\\src\\GUI\\car (1).png")); // Add your car image here
-        frm.add(Auto); // Add car to the frame
+        frm.add(backgroundPanel); // background panel erzeugen
 
         // Tastenbedienung
         KeyListener keyListener = new KeyListener() {
@@ -87,14 +100,23 @@ public class Rennspiel {
 
                 int x = Auto.getX();
                 int y = Auto.getY();
+                if (!(Spielstatus == "RUN"))
+                    return;
 
                 switch (code) {
                     case KeyEvent.VK_DOWN:
-                        y = y + 10;
+                        y = y + 125;
+                        if (y >= 305 + 125 * 4){
+                         return;
+                        }
                         break;
                     case KeyEvent.VK_UP:
-                        y = y - 10;
+                        y = y - 125;
+                        if (y < 305){
+                            return;
+                        }
                         break;
+
                 }
 
                 // Update car's position
@@ -106,13 +128,14 @@ public class Rennspiel {
                 // Not used
             }
         };
+        frm.addKeyListener(keyListener);
 
         // Timer to update game state
-        Timer timer = new Timer(10, new ActionListener() {
+        timer = new Timer(10, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (Spielstatus.equals("RUN")) {
-
+                    frm.repaint();
                 }
             }
         });
@@ -122,31 +145,53 @@ public class Rennspiel {
         frm.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {
+
             }
 
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_SPACE && Spielstatus.equals("RUN")) {
-                    timer.setDelay(0);
+                    currentSpeed = baseSpeed + 3;
                 }
+                if (e.getKeyCode() == KeyEvent.VK_RIGHT && Spielstatus.equals("RUN")) {
+                    if (!((baseSpeed +2) > maxSpeed)) {
+                        baseSpeed += 2;
+                        currentSpeed = baseSpeed;
+                    }
+
+
+                }
+                if (e.getKeyCode() == KeyEvent.VK_LEFT && Spielstatus.equals("RUN")) {
+                    if (!((baseSpeed -2) < 10)) {
+                        baseSpeed -= 2;
+                        currentSpeed = baseSpeed;
+                    }
+
+                }
+
+
             }
 
             @Override
             public void keyReleased(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_SPACE && Spielstatus.equals("RUN")) {
-                    timer.setDelay(10);
+                    currentSpeed = baseSpeed;
                 }
             }
         });
+
+
 
         // Make the frame visible
         frm.setVisible(true);
     }
 
+
     // Custom JPanel for background rendering
     static class BackgroundPanel extends JPanel {
         private ImageIcon backgroundIcon = new ImageIcon("C:\\Users\\Viktor K\\IdeaProjects\\1Project\\src\\GUI\\HG (1).jpg");
         private int x = 0;
+
 
         @Override
         protected void paintComponent(Graphics g) {
@@ -158,14 +203,17 @@ public class Rennspiel {
             g.drawImage(backgroundImage, x + getWidth(), 0, getWidth(), getHeight(), this);
 
             // Move background left
-            x -= 2;
+            x -= currentSpeed;
 
             // Reset position when background moves off screen
             if (x <= -getWidth()) {
                 x = 0;
             }
+            //KMH anzeige
+            Font font = g.getFont().deriveFont( 50.0f );
+            g.setColor(Color.BLACK);
+            g.drawString((currentSpeed * 7.5f) +" kmh",200,200);
 
-            repaint(); // Keep the background moving
         }
     }
 
