@@ -1,4 +1,4 @@
-package GUI.Rennspiel1;
+package Rennspiel1;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -16,16 +16,24 @@ public class Rennspiel {
     private static JButton pause;
     private static JLabel Strecke;
     static String Spielstatus = "POS";
-    static int x_diff_Auto;
-    static int y_diff_Auto;
     static boolean schneller = false;
     static Timer timer;
     static int baseSpeed = 10;
     static int currentSpeed = baseSpeed;
 
-    static int maxSpeed = 22;
+    static JButton titel;
+
+    static int maxSpeed = 25;
 
     public static void main(String[] args) {
+
+        // JFrame titel = new JFrame();
+        //titel.setTitle("Wilkommen zu Streetracer");
+        //titel.setSize(100, 100);
+        //titel.setLocation(0, 0);
+        //titel.setResizable(true);
+        //titel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //titel.setLayout(null);
 
         // Fenster erzeugen
         JFrame frm = new JFrame();
@@ -52,7 +60,7 @@ public class Rennspiel {
         //Start Button
         start = new JButton("Start");
         start.setFocusable(false);
-        start.setBounds(100,20,100,50);
+        start.setBounds(180,20,100,50);
         start.setOpaque(true);
         frm.add(start);
         start.addActionListener(e -> Spielstatus = "RUN");
@@ -61,13 +69,13 @@ public class Rennspiel {
         pause = new JButton("Pause");
         pause.setOpaque(true);
         pause.setFocusable(false);
-        pause.setBounds(220,20,100,50);
+        pause.setBounds(60,20,100,50);
         frm.add(pause);
         pause.addActionListener(e -> Spielstatus = "POS");
         System.out.println(Spielstatus);
         BufferedImage autoimage;
         try {
-            autoimage = ImageIO.read(new File("C:\\Users\\Viktor K\\IdeaProjects\\1Project\\src\\GUI\\resources\\img.png"));
+            autoimage = ImageIO.read(new File("Z:\\IT(s)\\Intellig\\HelloWorld\\src\\Rennspiel1\\spr_formula_0.png"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -107,7 +115,7 @@ public class Rennspiel {
                     case KeyEvent.VK_DOWN:
                         y = y + 125;
                         if (y >= 305 + 125 * 4){
-                         return;
+                            return;
                         }
                         break;
                     case KeyEvent.VK_UP:
@@ -189,7 +197,7 @@ public class Rennspiel {
 
     // Custom JPanel for background rendering
     static class BackgroundPanel extends JPanel {
-        private ImageIcon backgroundIcon = new ImageIcon("C:\\Users\\Viktor K\\IdeaProjects\\1Project\\src\\GUI\\HG (1).jpg");
+        private ImageIcon backgroundIcon = new ImageIcon("Z:\\IT(s)\\Intellig\\HelloWorld\\src\\Rennspiel1\\Hg.png");
         private int x = 0;
 
 
