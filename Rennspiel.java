@@ -8,16 +8,19 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.io.File;
 import java.io.IOException;
+import java.util.Random;
 
 public class Rennspiel {
 
     private static JLabel Auto; // Car
     private static JButton start;
     private static JButton pause;
-    private static JLabel Strecke;
+    private static JLabel roadblock;
     static String Spielstatus = "POS";
     static boolean schneller = false;
     static Timer timer;
+    private static int x = 0;
+    private static int y;
     static int baseSpeed = 10;
     static int currentSpeed = baseSpeed;
 
@@ -74,6 +77,7 @@ public class Rennspiel {
         pause.addActionListener(e -> Spielstatus = "POS");
         System.out.println(Spielstatus);
         BufferedImage autoimage;
+        BufferedImage roadblockimage;
         try {
             autoimage = ImageIO.read(new File("Z:\\IT(s)\\Intellig\\HelloWorld\\src\\Rennspiel1\\spr_formula_0.png"));
         } catch (IOException e) {
@@ -86,6 +90,16 @@ public class Rennspiel {
         Auto.setOpaque(false);
         frm.add(Auto); // Add car to the frame
 
+
+        try {
+            roadblockimage = ImageIO.read(new File("Z:\\IT(s)\\Intellig\\HelloWorld\\src\\Rennspiel1\\roadblock.png"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        roadblock = new JLabel(new ImageIcon(roadblockimage));
+        roadblock.setBounds( 1920,200,roadblockimage.getWidth(), roadblockimage.getHeight());
+        roadblock.setOpaque(false);
+        frm.add(roadblock);
         // willkommensfenster
         //JOptionPane.showMessageDialog(null, "Hallo, und willkommen zum Street Racer", "", JOptionPane.INFORMATION_MESSAGE);
 
@@ -143,6 +157,21 @@ public class Rennspiel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (Spielstatus.equals("RUN")) {
+
+                    Random random = new Random();
+                    int zufallszahl = random.nextInt(4); // Zahl im Bereich 0..3
+
+                    switch (zufallszahl){
+                        case 0:
+                            roadblock.setBounds(x + 1000,305,roadblock.getWidth(), roadblock.getHeight());
+                        case 1:
+                            roadblock.setBounds(x,420,roadblock.getWidth(), roadblock.getHeight());
+                        case 2:
+                            roadblock.setBounds(x,535,roadblock.getWidth(), roadblock.getHeight());
+                        case 3:
+                            roadblock.setBounds(x,305,roadblock.getWidth(), roadblock.getHeight());
+                    }
+
                     frm.repaint();
                 }
             }
@@ -197,8 +226,8 @@ public class Rennspiel {
 
     // Custom JPanel for background rendering
     static class BackgroundPanel extends JPanel {
-        private ImageIcon backgroundIcon = new ImageIcon("Z:\\IT(s)\\Intellig\\HelloWorld\\src\\Rennspiel1\\Hg.png");
-        private int x = 0;
+        private ImageIcon backgroundIcon = new ImageIcon("Z:\\IT(s)\\Intellig\\HelloWorld\\src\\Rennspiel1\\shared image.jpg");
+
 
 
         @Override
